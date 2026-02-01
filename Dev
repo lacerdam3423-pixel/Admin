@@ -1,0 +1,126 @@
+-- DEV / ADMIN PANEL (GUI COMPLETA)
+-- Uso permitido: apenas no SEU jogo
+
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
+local player = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+gui.Name = "DevPanelGui"
+gui.ResetOnSpawn = false
+
+-- BOTÃO FLUTUANTE
+local openBtn = Instance.new("TextButton", gui)
+openBtn.Size = UDim2.fromOffset(50,50)
+openBtn.Position = UDim2.new(0,10,0.5,-25)
+openBtn.Text = "☰"
+openBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+openBtn.TextColor3 = Color3.fromRGB(0,255,0)
+openBtn.Visible = false
+openBtn.Draggable = true
+openBtn.Active = true
+
+-- JANELA PRINCIPAL
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.fromOffset(300,350)
+main.Position = UDim2.new(0.5,-150,0.5,-175)
+main.BackgroundColor3 = Color3.fromRGB(15,15,15)
+main.Active = true
+main.Draggable = true
+
+-- TÍTULO
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1,0,0,35)
+title.Text = "DEV / ADMIN PANEL"
+title.BackgroundColor3 = Color3.fromRGB(10,10,10)
+title.TextColor3 = Color3.fromRGB(0,255,0)
+
+-- MINIMIZAR
+local minBtn = Instance.new("TextButton", main)
+minBtn.Size = UDim2.fromOffset(35,35)
+minBtn.Position = UDim2.new(1,-35,0,0)
+minBtn.Text = "_"
+minBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+minBtn.TextColor3 = Color3.fromRGB(255,255,255)
+
+-- CONTAINER
+local container = Instance.new("Frame", main)
+container.Position = UDim2.new(0,0,0,35)
+container.Size = UDim2.new(1,0,1,-35)
+container.BackgroundTransparency = 1
+
+-- FUNÇÃO BOTÃO
+local function createButton(text, y, callback)
+    local b = Instance.new("TextButton", container)
+    b.Size = UDim2.new(1,-20,0,35)
+    b.Position = UDim2.new(0,10,0,y)
+    b.Text = text
+    b.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    b.TextColor3 = Color3.fromRGB(255,255,255)
+    b.MouseButton1Click:Connect(callback)
+end
+
+-- ESTADOS
+local speedOn = false
+local jumpOn = false
+local noclip = false
+local fly = false
+
+-- SPEED
+createButton("Speed Toggle",10,function()
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        speedOn = not speedOn
+        hum.WalkSpeed = speedOn and 50 or 16
+    end
+end)
+
+-- JUMP
+createButton("Jump Toggle",55,function()
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        jumpOn = not jumpOn
+        hum.JumpPower = jumpOn and 120 or 50
+    end
+end)
+
+-- FULLBRIGHT
+createButton("Full Bright",100,function()
+    Lighting.Brightness = 3
+    Lighting.ClockTime = 12
+    Lighting.FogEnd = 1e6
+end)
+
+-- NOCLIP
+createButton("NoClip Toggle",145,function()
+    noclip = not noclip
+end)
+
+-- RESET
+createButton("Reset Character",190,function()
+    player.Character:BreakJoints()
+end)
+
+-- LOOP NOCLIP
+game:GetService("RunService").Stepped:Connect(function()
+    if noclip and player.Character then
+        for _,v in pairs(player.Character:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanCollide = false
+            end
+        end
+    end
+end)
+
+-- MINIMIZAR
+minBtn.MouseButton1Click:Connect(function()
+    main.Visible = false
+    openBtn.Visible = true
+end)
+
+-- ABRIR DE NOVO
+openBtn.MouseButton1Click:Connect(function()
+    main.Visible = true
+    openBtn.Visible = false
+end)
